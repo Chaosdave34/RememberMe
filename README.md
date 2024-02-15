@@ -1,0 +1,1 @@
+# Velocity plugin that remembers the last server you joined
