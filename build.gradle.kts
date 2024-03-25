@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.0.1"
 }
 
-group = "net.gamerhub"
+group = "io.github.chaosdave34"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -33,7 +33,7 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
         options.release.set(targetJavaVersion)
     }
 }

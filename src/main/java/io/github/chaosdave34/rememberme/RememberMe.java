@@ -1,25 +1,22 @@
-package net.gamerhub.rememberme;
+package io.github.chaosdave34.rememberme;
 
 import com.google.inject.Inject;
-import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.*;
-import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.proxy.ProxyPingEvent;
-import com.velocitypowered.api.event.query.ProxyQueryEvent;
+import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import com.velocitypowered.api.proxy.server.ServerPing;
-import jdk.jfr.Registered;
+import net.gamerhub.rememberme.BuildConstants;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
-import java.security.Permission;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Plugin(
         id = "rememberme",
