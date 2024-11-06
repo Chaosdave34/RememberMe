@@ -1,49 +1,48 @@
-import org.jetbrains.gradle.ext.ProjectSettings
-import org.jetbrains.gradle.ext.TaskTriggersConfig
+import org.jetbrains.gradle.ext.settings
+import org.jetbrains.gradle.ext.taskTriggers
 
 plugins {
-    id("java")
+    kotlin("jvm") version "2.0.20-Beta1"
+    kotlin("kapt") version "2.0.20-Beta1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("eclipse")
-    id("org.jetbrains.gradle.plugin.idea-ext") version "1.0.1"
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.8"
 }
 
-group = "io.github.chaosdave34"
-version = "1.0-SNAPSHOT"
+group = "io.github.chaosdave34.rememberme"
+version = "1.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.papermc.io/repository/maven-public/") {
+        name = "papermc-repo"
+    }
+    maven("https://oss.sonatype.org/content/groups/public/") {
+        name = "sonatype"
+    }
 }
 
 dependencies {
-    compileOnly("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
+    compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
+    kapt("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
-val targetJavaVersion = 11
-java {
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+tasks {
+    build {
+        dependsOn(shadowJar)
     }
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
-        options.release.set(targetJavaVersion)
-    }
+val targetJavaVersion = 21
+kotlin {
+    jvmToolchain(targetJavaVersion)
 }
 
 val templateSource = file("src/main/templates")
 val templateDest = layout.buildDirectory.dir("generated/sources/templates")
-val generateTemplates = tasks.register("generateTemplates", Copy::class) {
-    val props = mapOf(
-            "version" to project.version
-    )
+val generateTemplates = tasks.register<Copy>("generateTemplates") {
+    val props = mapOf("version" to project.version)
     inputs.properties(props)
 
     from(templateSource)
@@ -51,18 +50,7 @@ val generateTemplates = tasks.register("generateTemplates", Copy::class) {
     expand(props)
 }
 
-sourceSets["main"].java {
-    srcDir(generateTemplates.map { it.outputs })
-}
+sourceSets.main.configure { java.srcDir(generateTemplates.map { it.outputs }) }
 
-rootProject.idea.project{
-    this as ExtensionAware
-    configure<ProjectSettings> {
-        this as ExtensionAware
-        configure<TaskTriggersConfig> {
-            afterSync(generateTemplates)
-        }
-    }
-}
-
+project.idea.project.settings.taskTriggers.afterSync(generateTemplates)
 project.eclipse.synchronizationTasks(generateTemplates)
