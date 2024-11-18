@@ -1,4 +1,4 @@
-package net.gamerhub.rememberme;
+package io.github.chaosdave34.rememberme;
 
 // The constants are replaced before compilation
 object BuildConstants {
